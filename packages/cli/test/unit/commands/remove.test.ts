@@ -56,4 +56,40 @@ describe('remove', () => {
 
     expect(deleteAPIWasCalled);
   });
+
+  it('does not remove in-progress deployments', async () => {
+    const user = useUser();
+
+    const project = useProject({
+      ...defaultProject,
+      id: '123',
+    });
+
+    useUnknownProject();
+
+    client.scenario.get('/v3/now/aliases', (_req, res) => {
+      res.json({ aliases: [] });
+    });
+
+    (['READY', 'BUILDING'] as const).map(state =>
+      useDeployment({
+        creator: user,
+        project,
+        state,
+      })
+    );
+
+    let deploymentIdUndefined = false;
+
+    client.scenario.delete('/now/deployments/:id', (req, res) => {
+      // TODO: mocked deployment doesn't have valid id, status, etc.
+      deploymentIdUndefined = req.params.id === 'undefined';
+      res.json({});
+    });
+
+    client.setArgv('remove', `${project.project.name}`, '--safe', '--yes');
+    await remove(client);
+
+    expect(deploymentIdUndefined).toBe(false);
+  });
 });
