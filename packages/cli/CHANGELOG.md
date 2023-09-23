@@ -1,5 +1,13 @@
 # vercel
 
+## 32.3.2
+
+### Patch Changes
+
+- remove unused source map pkg ([#10577](https://github.com/vercel/vercel/pull/10577))
+
+- disable source map for prod build ([#10575](https://github.com/vercel/vercel/pull/10575))
+
 ## 32.3.1
 
 ### Patch Changes
